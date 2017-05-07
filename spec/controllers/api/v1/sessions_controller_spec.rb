@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::SessionsController, type: :controller do
-  describe "POST #create" do
 
+  describe "POST #create" do
     before(:each) do
       @user = FactoryGirl.create :user
     end
@@ -19,7 +19,7 @@ RSpec.describe Api::V1::SessionsController, type: :controller do
         expect(json_response[:auth_token]).to eq(@user.auth_token)
       end
 
-      it { expect(response).to have_http_status 200}
+      it { expect(response).to have_http_status 200 }
     end
 
     context "when the credentials are incorrect" do
@@ -33,8 +33,18 @@ RSpec.describe Api::V1::SessionsController, type: :controller do
         expect(json_response[:errors]).to eq "Invalid email or password"
       end
 
-      it { expect(response).to have_http_status 422}
+      it { expect(response).to have_http_status 422 }
     end
-    
   end
+
+  describe "DELETE #destroy" do
+    before(:each) do
+      @user = FactoryGirl.create :user
+      sign_in @user
+      delete :destroy, id: @user.auth_token
+    end
+
+    it { expect(response).to have_http_status 204 }
+  end
+
 end
