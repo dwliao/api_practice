@@ -20,19 +20,22 @@ end
     end
 
     describe "#authenticate_with_token" do
+      controller(ApplicationController) do
+        before_action :authenticate_with_token!
+        def dummy_action; end
+      end
       before do
+        routes.draw { get 'dummy_action' => 'anonymous#dummy_action'}
         @user = FactoryGirl.create :user
         allow(authentication).to receive(:current_user).and_return(nil)
-        allow(response).to receive(:response_code).and_return(401)
-        allow(response).to receive(:body).and_return({ "errors" => "Not authenticated" }.to_json)
-        allow(authentication).to receive(:response).and_return(response)
+        get :dummy_action
       end
 
       it "render a json error message" do
         expect(json_response[:errors]).to eq("Not authenticated")
       end
 
-      #it { expect(response).to have_http_status 401 }
+      it { expect(response).to have_http_status 401 }
     end
 
     describe "#user_signed_in?" do
