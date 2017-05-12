@@ -59,7 +59,48 @@ RSpec.describe Api::V1::ProductsController, type: :controller do
         expect(product_response).to have_key(:errors)
       end
 
-      it "renders the json errors on whye the user could not be created" do
+      it "renders the json errors on why the user could not create" do
+        product_response = json_response
+        expect(product_response[:errors][:price]).to include "is not a number"
+      end
+
+      it { expect(response).to have_http_status 422 }
+    end
+  end
+
+  describe "PUT/PATCH #update" do
+    before(:each) do
+      @user = FactoryGirl.create :user
+      @product = FactoryGirl.create :product, user: @user
+      api_authorization_header @user.auth_token
+    end
+
+    context "when is successfully updated" do
+      before (:each) do
+        patch :update, params: { user_id: @user.id, id: @product.id,
+                                 product: { title: "New TV" } }
+      end
+
+      it "renders the json representation for the updated" do
+        product_response = json_response
+        expect(product_response[:title]).to eq "New TV"
+      end
+
+      it { expect(response).to have_http_status 200 }
+    end
+
+    context "when is not updated" do
+      before(:each) do
+        patch :update, params: { user_id: @user.id, id: @product.id,
+                                 product: { price: "two" } }
+      end
+
+      it "renders an error json" do
+        product_response = json_response
+        expect(product_response).to have_key(:errors)
+      end
+
+      it "renders the json errors on why the user could not update" do
         product_response = json_response
         expect(product_response[:errors][:price]).to include "is not a number"
       end
