@@ -5,7 +5,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   describe "GET #show" do
     before(:each) do
       @user = FactoryGirl.create :user
-      get :show, params: { id: 1 }
+      get :show, params: { id: @user.id }
     end
 
     it "returns the information about a reporter on a hash" do
@@ -14,6 +14,11 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     end
 
     it { expect(response).to have_http_status(200) }
+
+    it "has the product ids as an embeded object" do
+      user_response = json_response
+      expect(user_response[:product_ids]).to eq []
+    end
   end
 
   describe "POST #create" do
