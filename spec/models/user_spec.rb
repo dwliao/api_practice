@@ -27,6 +27,9 @@ RSpec.describe User, type: :model do
     # We test the auth_token is unique
     it { should validate_uniqueness_of(:auth_token) }
 
+    it { should have_many(:products) }
+    it { should have_many(:orders) }
+
     describe "#generate_authentication_token!" do
       it "generates a unique token" do
         allow(Devise).to receive(:friendly_token).and_return("auniquetoken123")
@@ -40,8 +43,6 @@ RSpec.describe User, type: :model do
         expect(@user.auth_token).not_to eq existing_user.auth_token
       end
     end
-
-    it { should have_many(:products) }
   end
 
   describe "#products association" do
