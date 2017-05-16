@@ -32,4 +32,22 @@ RSpec.describe Api::V1::OrdersController, type: :controller do
 
     it { expect(response).to have_http_status 200 }
   end
+
+  describe "POST #create" do
+    before(:each) do
+      current_user = FactoryGirl.create :user
+      api_authorization_header current_user.auth_token
+      product_1 = FactoryGirl.create :product
+      product_2 = FactoryGirl.create :product
+      order_params = { product_ids: [product_1.id, product_2.id] }
+      post :create, params: { user_id: current_user.id, order: order_params }
+    end
+
+    it "returns the just user order record" do
+      order_response = json_response
+      expect(order_response[:id]).to be_present
+    end
+
+    it { expect(response).to have_http_status 201 }
+  end
 end
