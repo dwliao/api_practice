@@ -30,12 +30,13 @@ RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.include Devise::Test::ControllerHelpers, type: :controller
+
   config.include(Shoulda::Matchers::ActiveModel, type: :model)
   config.include(Shoulda::Matchers::ActiveRecord, type: :model)
 
   #Including to test requests
   config.include Request::JsonHelpers, :type => :controller
-  
+
   config.include Request::HeadersHelpers, :type => :controller
 
   config.before(:each, type: :controller) do
