@@ -13,6 +13,11 @@ RSpec.describe Api::V1::ProductsController, type: :controller do
     end
 
     it { expect(response).to have_http_status 200 }
+
+    it "has the user as a embeded object" do
+      product_response = json_response
+      expect(product_response[:user][:email]).to eq @product.user.email
+    end
   end
 
   describe "GET #index" do
@@ -27,6 +32,13 @@ RSpec.describe Api::V1::ProductsController, type: :controller do
     end
 
     it { expect(response).to have_http_status 200 }
+
+    it "returns the user object into each product" do
+      products_response = json_response
+      products_response.each do |product_response|
+        expect(product_response[:user]).to be_present
+      end
+    end
   end
 
   describe "POST #create" do
@@ -118,5 +130,46 @@ RSpec.describe Api::V1::ProductsController, type: :controller do
     end
 
     it { expect(response).to have_http_status 204 }
+  end
+
+  describe "GET #index" do
+    before(:each) do
+      4.times { FactoryGirl.create :product }
+    end
+
+    context "when is not receiving any product_ids parameter" do
+      before(:each) do
+        get :index
+      end
+
+      it "returns 4 records from the database" do
+        products_response = json_response
+        expect(products_response.length).to eq(4)
+      end
+
+      it "returns the user object into each product" do
+        products_response = json_response
+        products_response.each do |product_response|
+          expect(product_response[:user]).to be_present
+        end
+      end
+
+      it { expect(response).to have_http_status 200 }
+    end
+
+    context "when product_ids parameter is sent" do
+      before(:each) do
+        @user = FactoryGirl.create :user
+        3.times { FactoryGirl.create :product, user: @user }
+        get :index, params: { product_ids: @user.product_ids }
+      end
+
+      it "returns just the products that belong to the user" do
+        products_response = json_response
+        products_response.each do |product_response|
+          expect(product_response[:user][:email]).to eq @user.email
+        end
+      end
+    end
   end
 end

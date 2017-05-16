@@ -7,7 +7,7 @@ class Api::V1::ProductsController < ApplicationController
   end
 
   def index
-    respond_with Product.all
+    respond_with Product.search(params)
   end
 
   def create
