@@ -49,6 +49,7 @@ end
 group :test do
   gem "rspec-rails"
   gem "shoulda-matchers", git: 'https://github.com/thoughtbot/shoulda-matchers.git', branch: 'rails-5'
+  gem "email_spec"
 end
 
 gem "devise"
