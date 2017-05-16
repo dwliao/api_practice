@@ -21,13 +21,25 @@ RSpec.describe Api::V1::OrdersController, type: :controller do
     before(:each) do
       current_user = FactoryGirl.create :user
       api_authorization_header current_user.auth_token
-      @order = FactoryGirl.create :order, user: current_user
+
+      @product = FactoryGirl.create :product
+      @order = FactoryGirl.create :order, user: current_user, product_ids: [@product.id]
       get :show, params: { user_id: current_user.id, id: @order.id }
     end
 
     it "returns the user order record matching the id" do
       order_response = json_response
       expect(order_response[:id]).to eq @order.id
+    end
+
+    it "includes the total for the order" do
+      order_response = json_response
+      expect(order_response[:total]).to eq @order.total.to_s
+    end
+
+    it "includes the products on the order" do
+      order_response = json_response
+      expect(order_response[:products].length).to eq 1
     end
 
     it { expect(response).to have_http_status 200 }
